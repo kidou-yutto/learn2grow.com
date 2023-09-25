@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA and Percentage Calculator</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to top, rgba(0,0,0,0.5)50%,rgba(0,0,0,0.5)50%), url(images/44.webp);
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #d4e4f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+            margin: 10px;
+            padding: 20px;
+            text-align: center;
+            max-width: 550px;
+            margin: 1% auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #085189;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #136255;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .input-row {
+                flex-direction: row;
+                width: auto;
+                max-width: 60%;
+            }
+
+            input[type="number"] {
+                margin-right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CGPA and Percentage Calculator</h1>
+        <form id="calculator-form">
+            <label for="numSemesters">Number of Semesters:</label>
+            <input type="number" id="numSemesters" name="numSemesters" required>
+            <div id="inputFields">
+                <!-- Input fields for SGPA and Credits will be generated dynamically using JavaScript -->
+            </div>
+            <button type="button" id="calculateButton">Calculate</button>
+        </form>
+        <div id="result">
+            <!-- CGPA and Percentage results will be displayed here -->
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("calculator-form");
+            const inputFields = document.getElementById("inputFields");
+            const resultDiv = document.getElementById("result");
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // Prevent form submission
+            });
+
+            document.getElementById("calculateButton").addEventListener("click", function () {
+                const numSemesters = parseInt(document.getElementById("numSemesters").value);
+                let totalCredits = 0;
+                let totalWeightedScore = 0;
+
+                // Clear previous results
+                resultDiv.innerHTML = "";
+
+                // Generate input fields for SGPA and Credits
+                inputFields.innerHTML = "";
+                for (let i = 0; i < numSemesters; i++) {
+                    for (let j = 0; j < 2; j++) {
+                        const inputRow = document.createElement("div");
+                        inputRow.classList.add("input-column");
+
+                        const sgpaInput = document.createElement("input");
+                        sgpaInput.type = "number";
+                        sgpaInput.placeholder = `SGPA of Semester ${i + 1}-${j + 1}`;
+                        sgpaInput.name = `sgpa_${i}_${j}`;
+
+                        const creditsInput = document.createElement("input");
+                        creditsInput.type = "number";
+                        creditsInput.placeholder = `Credits of Semester ${i + 1}-${j + 1}`;
+                        creditsInput.name = `credits_${i}_${j}`;
+
+                        inputRow.appendChild(sgpaInput);
+                        inputRow.appendChild(creditsInput);
+                        inputFields.appendChild(inputRow);
+                    }
+                }
+
+                // Create a Calculate button to trigger the calculation
+                const calculateButton = document.createElement("button");
+                calculateButton.textContent = "Calculate";
+                calculateButton.type = "button";
+                calculateButton.addEventListener("click", function () {
+                    let totalCredits = 0;
+                    let totalWeightedScore = 0;
+
+                    // Loop through input fields to get SGPA and Credits
+                    for (let i = 0; i < numSemesters; i++) {
+                        for (let j = 0; j < 2; j++) {
+                            const sgpa = parseFloat(document.getElementsByName(`sgpa_${i}_${j}`)[0].value);
+                            const credits = parseFloat(document.getElementsByName(`credits_${i}_${j}`)[0].value);
+
+                            if (isNaN(sgpa) || isNaN(credits) || sgpa < 0.0 || sgpa > 10.0 || credits < 0.0 || credits > 100.0) {
+                                resultDiv.innerHTML = "Invalid input. Please make sure you enter valid SGPA and Credits.";
+                                return;
+                            }
+
+                            const gradePoints = sgpa;
+                            const creditPoints = credits;
+
+                            totalWeightedScore += gradePoints * creditPoints;
+                            totalCredits += creditPoints;
+                        }
+                    }
+
+                    const cgpa = totalWeightedScore / totalCredits;
+                    const percentage = (cgpa - 0.75) * 10;
+
+                    resultDiv.innerHTML = `CGPA = ${cgpa.toFixed(2)}<br>Percentage = ${percentage.toFixed(2)}%`;
+                });
+
+                inputFields.appendChild(calculateButton);
+            });
+        });
+    </script>
+</body>
+</html>
